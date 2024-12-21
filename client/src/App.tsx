@@ -1,24 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './store/store';
+import { checkAuth, logout } from './store/AuthSlice';
+// import { IAuthState } from './models/IAuthState';
 import './App.css';
+import LoginForm from './components/LoginForm';
 
-function App() {
+const App: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, user, loading, error } = useSelector(
+    (state: RootState) => state.auth
+  );
+  
+  useEffect (() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  if(loading) return <div>Loading...</div>
+
+  const onLogoutHandler = () => {
+    dispatch(logout());
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {
+        isAuthenticated ? 
+        (
+          <div>
+            <h1>Welcome, {user?.email}</h1>
+            <button onClick={onLogoutHandler}>Logout</button>
+          </div>
+        ) : (
+          <div>
+            <h1>Please log in</h1>
+            {error && <p className="error">{error}</p>}
+          <LoginForm />
+          <button onClick={onLogoutHandler}>Logout</button>
+          </div>
+        )
+      }
     </div>
   );
 }

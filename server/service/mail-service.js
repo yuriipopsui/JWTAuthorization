@@ -4,6 +4,8 @@ import nodemailer from "nodemailer";
 //Will be realized later
 class MailService {
 
+
+  
   constructor() {
     this.transporter = nodemailer.createTransport({
       // host:

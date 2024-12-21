@@ -1,7 +1,7 @@
 import UserService from "../service/user-service.js";
 import UserJWT from "../models/user-model.js";
 import { validationResult } from "express-validator";
-import ApiError from "../exeptions/api-errors.js";
+import ApiError from "../exceptions/api-errors.js";
 
 //App architecture: Router => Controller => Service( logic for hanling req/res in Controller)
 class UserController {
@@ -12,6 +12,7 @@ class UserController {
         return next(ApiError.BadRequest('Error in validation', errors.array()));
       }
       const {email, password} = req.body;
+
       const userData = await UserService.registration(email, password);
 
       res.cookie('refreshToken', userData.refreshToken, {
@@ -21,9 +22,7 @@ class UserController {
       });
       return res.status(201).json(userData);
     } catch (error) {
-      next(error);
-      console.error("Error in registration:", error.message);
-      return res.status(400).json({ message: error.message });
+      return next(error);
     }
   }
   async login(req, res, next) {
@@ -82,6 +81,18 @@ class UserController {
       const users_jwt = await UserService.getAllUsers();
       return res.json(users_jwt);
 
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async checkAuth(req, res, next) {
+    try {
+      const userData = req.user;
+      if(!userData) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      return res.status(200).json({ user: userData });
     } catch (error) {
       next(error);
     }

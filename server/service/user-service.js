@@ -4,7 +4,7 @@ import {v4 as uuidv4} from "uuid";
 import MailService from "./mail-service.js";
 import TokenService from "./token-service.js";
 import UserDto from "../dtos/userDto.js";
-import ApiError from "../exeptions/api-errors.js";
+import ApiError from "../exceptions/api-errors.js";
 import util from "node:util";
 // import userModel from "../models/user-model.js";
 
@@ -12,7 +12,7 @@ class UserService {
   async registration(email, password) {
     const candidate = await UserJWT.findOne({email});
     if(candidate) {
-      throw ApiError.BadRequest(`User with email: ${email} already exists`);
+      throw ApiError.BadRequest(`User with email ${email} alredy exist.`);
     }
     const salt = crypto.randomBytes(16).toString('hex');
     const hashedPassword = crypto.scryptSync(password, salt, 64).toString('hex');
@@ -35,7 +35,7 @@ class UserService {
   async activate(activationLink) {
     const user = await UserJWT.findOne({activationLink});
     if(!user) {
-      throw ApiError.BadRequest('Incorrect actiovation link');
+      throw ApiError.BadRequest('Incorrect activation link');
     }
     user.isActivated = true;
     await user.save();
@@ -71,7 +71,7 @@ class UserService {
   }
 
   async logout(refreshToken) {
-    const token = await TokenService.removeToken({refreshToken});
+    const token = await TokenService.removeToken(refreshToken);
     return token;
   }
 

@@ -1,4 +1,4 @@
-import ApiError from "../exeptions/api-errors.js";
+import ApiError from "../exceptions/api-errors.js";
 import TokenService from "../service/token-service.js";
 
 function authMiddleware(req, res, next) {
